@@ -1,4 +1,7 @@
 from Team import Team
+import ImportData
 
-bruins = Team("Boston Bruins")
-print(bruins.get_team_name())
+ImportData.print_all_teams()
+
+
+
