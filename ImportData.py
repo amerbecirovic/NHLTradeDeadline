@@ -1,38 +1,53 @@
 import requests
 import json
 
-#function to create a Python dictionary out of NHL API json data
-def create_dict(response):
-    raw_data_dict = json.loads(json.dumps(response.json()))
-    return raw_data_dict
+#declare empty list for storing raw data retrieved from request, global variable so it can be used by other functions.
+raw_data = []
+
+#make the request, store the data in raw_data
+response = requests.get("https://statsapi.web.nhl.com/api/v1/teams/")
+raw_data_dict = json.loads(json.dumps(response.json()))
+raw_data.append(raw_data_dict)
 
 #function to print all teams in the league, sorted in order
 def print_all_teams():
 
-    #declare list to get raw data from the request. declare new dictionary to parse a list of unsorted teams
-    raw_data = []
+    #declare new dictionary to parse a list of unsorted teams
     unsorted_teams = {}
-
-    #make the request
-    response = requests.get("https://statsapi.web.nhl.com/api/v1/teams/")
-    raw_data.append(create_dict(response))
 
     #fill the unsorted teams dictionary with all of the teams in the league
     for i in range(0, 31):
         unsorted_teams[i] = raw_data[0]['teams'][i]['name']
 
-    #sort the dictionary in alphabetical order
+    #sort the teams in alphabetical order
     sorted_teams_list = sorted(unsorted_teams.values())
-    sorted_teams = {}
 
-    for i in range(0, 31):
-        sorted_teams[i] = sorted_teams_list[i]
+    for team in sorted_teams_list:
+        print(team)
 
-    counter = 1
-    for team in sorted_teams.values():
-        print(str(counter) + " - " + team)
-        counter += 1
+    return sorted_teams_list
+
+def get_team_id(team_name):
+
+    for teams in raw_data[0]['teams']:
+        if team_name in teams['name']:
+            return teams['id']
 
 #function to get team roster data
-def get_roster(team_name):
+def get_roster(team_id, season):
+    #make the API request, store the data
+    raw_roster_data = []
+    response = requests.get("https://statsapi.web.nhl.com/api/v1/teams/" + str(team_id) + "/?expand=team.roster&season=" + season)
+    raw_data_dict = json.loads(json.dumps(response.json()))
+    raw_roster_data.append(raw_data_dict)
+
+    full_roster = []
+
+    for player in raw_roster_data[0]['teams'][0]['roster']['roster']:
+        full_roster.append(player['person']['fullName'])
+
+    return full_roster
+
+def is_rookie(player_id):
     pass
+    
