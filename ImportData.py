@@ -41,13 +41,32 @@ def get_roster(team_id, season):
     raw_data_dict = json.loads(json.dumps(response.json()))
     raw_roster_data.append(raw_data_dict)
 
-    full_roster = []
+    full_roster = {}
 
     for player in raw_roster_data[0]['teams'][0]['roster']['roster']:
-        full_roster.append(player['person']['fullName'])
+
+        full_roster[player['person']['fullName']] = player['person']['id']
 
     return full_roster
 
-def is_rookie(player_id):
-    pass
-    
+
+def was_traded(player_id, season):
+
+    traded = False
+
+    raw_player_data = []
+    response = requests.get("https://statsapi.web.nhl.com/api/v1/people/" + str(player_id) + "/stats?stats=gameLog&season=" + season)
+    raw_data_dict = json.loads(json.dumps(response.json()))
+    raw_player_data.append(raw_data_dict)
+
+    for i in range(len(raw_player_data[0]['stats'][0]['splits'])):
+
+        if i == len(raw_player_data[0]['stats'][0]['splits']) - 1:
+            return False
+
+        current_team = raw_player_data[0]['stats'][0]['splits'][i]['team']['name']
+        next_team = raw_player_data[0]['stats'][0]['splits'][i+1]['team']['name']
+        if current_team != next_team:
+            return True
+
+    return False

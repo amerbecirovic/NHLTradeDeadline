@@ -32,21 +32,56 @@ def get_rosters(team_name):
     #get all rosters of the last ten years using by creating Roster objects from the team object
     for i in range(start_year, end_year):
         rosters[str(i) + str(i+1)] = team.get_roster(str(i) + str(i+1))
+    
+    return rosters
 
+def made_trade(rosters, season):
 
-def made_trade(rosters):
+    '''compare rosters x and x-1 to determine if players were added to the team for each season.'''
 
-    '''compare rosters x and x-1 to determine if players were added to the team.'''
+    #compare current season to the previous season. see what the differences are.
+    current_roster = rosters[season]
+    #print(current_roster.roster)
 
+    previous_season_x = season[:4]
+    previous_season_y = season[4:]
+    previous_season = str(int(previous_season_x) - 1) + str(int(previous_season_y) - 1)
 
+    previous_roster = rosters[previous_season]
+
+    set_difference = set(current_roster.get_players()) - set(previous_roster.get_players())
+    list_difference = list(set_difference)
+
+    #for each player added, check if they were traded that season to confirm the player was a trade and not a signing.
+   
+    for player in list_difference:
+        player_id = current_roster.roster[player]
+        if ImportData.was_traded(player_id, season):
+            return True
+
+    return False
+
+def made_playoffs(team):
     pass
 
-def team_success():
+def won_1st_rnd(team):
+    pass
 
-    '''if the team made a trade/added new players, determine where they finished that season, for every season over the
+def won_2nd_rnd(team):
+    pass
+
+def won_conf_final(team):
+    pass
+
+def won_cup(team):
+    pass
+
+def team_success(team):
+
+    '''if the team made a trade, determine where they finished that season, for every season over the
     last ten years. Missed playoffs? Made playoffs? won 1st rnd? won 2nd rnd? won conf final? won cup? Break out each
     possibility and show a % of each.''' 
-    
+
     pass
 
 

@@ -18,6 +18,7 @@ class Team:
     class Roster:
         def __init__(self, team, season):
             self.team = team
+            self.season = season
             self.roster = ImportData.get_roster(self.team_id(), season)
 
         def team_id(self):
@@ -26,6 +27,19 @@ class Team:
         def print_roster(self):
             for player in self.roster:
                 print(player)
+
+        def get_players(self):
+            players = []
+            for player in self.roster.keys():
+                players.append(player)
+            return players
+
+
+
+
+
+            
+
         
 
 
