@@ -70,3 +70,65 @@ def was_traded(player_id, season):
             return True
 
     return False
+
+def cup_winner(season):
+
+    raw_playoff_data = []
+    response = requests.get("https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?expand=round.series,schedule.game.seriesSummary&season=" + season)
+    raw_data_dict = json.loads(json.dumps(response.json()))
+    raw_playoff_data.append(raw_data_dict)
+    
+    winner_str = raw_playoff_data[0]['rounds'][3]['series'][0]['currentGame']['seriesSummary']['seriesStatus']
+    winner = winner_str.split()[0]
+
+    return winner
+
+
+
+def playoff_success(team, season):
+    #for given team and season entered, return the 6 boolean element status array.
+    success = [False] * 6
+    team_name = team.split()[-1]
+
+    raw_playoff_data = []
+    response = requests.get("https://statsapi.web.nhl.com/api/v1/tournaments/playoffs?expand=round.series,schedule.game.seriesSummary&season=" + season)
+    raw_data_dict = json.loads(json.dumps(response.json()))
+    raw_playoff_data.append(raw_data_dict)
+
+    num_rounds = 4
+
+    #get all matchups in a dictionary in the form of {round_number: [matchups]} for comparison
+    matchups = {}
+    for rounds in raw_playoff_data[0]['rounds']:
+        round_number = rounds['number']
+        series_list = []
+        for series in rounds['series']:
+            series_list.append(series['names']['matchupName'])
+        matchups[round_number] = series_list
+
+    for i in range(1, num_rounds + 1):
+
+        if i == 1:
+            for matchup in matchups[i]:
+                if team_name in matchup:
+                    success[0] = True
+
+        elif i == 2:
+            for matchup in matchups[i]:
+                if team_name in matchup:
+                    for k in range(0,2):
+                        success[k] = True
+
+        elif i == 3:
+            for matchup in matchups[i]:
+                if team_name in matchup:
+                    for k in range(0,3):
+                        success[k] = True
+
+        elif i == 4 and team_name in matchups[i][0]:
+            for k in range(0,5):
+                success[k] = True
+            if team_name == cup_winner(season):
+                success[5] = True
+
+    return success
