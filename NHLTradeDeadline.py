@@ -35,7 +35,7 @@ def get_rosters(team_name):
     
     return rosters
 
-def made_trade(rosters, season):
+def trade_count(rosters, season):
 
     '''compare rosters x and x-1 to determine if players were added to the team for each season.'''
 
@@ -53,13 +53,15 @@ def made_trade(rosters, season):
     list_difference = list(set_difference)
 
     #for each player added, check if they were traded that season to confirm the player was a trade and not a signing.
+
+    trade_count = 0
    
     for player in list_difference:
         player_id = current_roster.roster[player]
         if ImportData.was_traded(player_id, season):
-            return True
+            trade_count += 1
 
-    return False
+    return trade_count
 
 def team_success(team):
 
@@ -116,13 +118,12 @@ counts = team_success(team)
 def print_data(team, counts, rosters):
 
     #get total trades count over the 10 years
-    trade_count = 0
+    total_trade_count = 0
     for i in range(start_year, end_year):
-        if made_trade(rosters, str(i) + str(i+1)):
-            trade_count += 1
+        total_trade_count += trade_count(rosters, str(i) + str(i+1))
     
     print("\nThe {team_name} have made {trade_count} trades from {start_year} to {end_year}. Their playoff success is as follows:\n"
-    .format(team_name=team, trade_count=trade_count, start_year=start_year, end_year=end_year))
+    .format(team_name=team, trade_count=total_trade_count, start_year=start_year, end_year=end_year))
 
     print("Made Playoffs: " + str(counts[0]))
     print("Won 1st Round: " + str(counts[1]))
